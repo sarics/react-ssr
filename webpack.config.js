@@ -85,7 +85,7 @@ const clientConfig = {
 
   plugins: [
     new MiniCssExtractPlugin({
-      filename: isProd ? 'css/[name].[chunkhash:8].css' : 'css/[name].css',
+      filename: isProd ? 'css/[name].[contenthash:8].css' : 'css/[name].css',
     }),
     new ManifestPlugin({
       fileName: '../manifest.json',
