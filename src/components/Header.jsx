@@ -7,6 +7,8 @@ import Button from './Button';
 
 const Header = () => (
   <header className={classes.header}>
+    <div className={classes.logo} />
+
     <div className={classes.brand}>
       React SSR{' '}
       <span role="img" aria-label="rocket">

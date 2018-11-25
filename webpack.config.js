@@ -16,12 +16,14 @@ const getRules = type => {
     {
       test: /\.jsx?$/,
       exclude: /node_modules/,
-      use: {
-        loader: 'babel-loader',
-        options: {
-          cacheDirectory: true,
+      use: [
+        {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true,
+          },
         },
-      },
+      ],
     },
     {
       test: /\.(scss|sass)$/,
@@ -40,6 +42,19 @@ const getRules = type => {
           loader: 'sass-loader',
         },
       ].filter(Boolean),
+    },
+    {
+      test: /\.(jpe?g|png|gif|svg)$/,
+      use: [
+        {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[hash:8].[ext]',
+            outputPath: 'images/',
+            emitFile: isClient,
+          },
+        },
+      ],
     },
   ];
 };
