@@ -1,0 +1,76 @@
+@import '../styles/variables';
+
+@mixin variant($color) {
+  $hover-color: darken($color, 5%);
+  $active-color: darken($color, 15%);
+
+  border-color: $color;
+
+  &:hover {
+    border-color: $hover-color;
+  }
+  &:active,
+  &:global(.active) {
+    border-color: $active-color;
+  }
+
+  &.normal {
+    background-color: $color;
+    color: $color-white;
+
+    &:hover {
+      background-color: $hover-color;
+      color: $color-white;
+    }
+    &:active,
+    &:global(.active) {
+      background-color: $active-color;
+      color: $color-white;
+    }
+  }
+
+  &.outlined {
+    background-color: $color-white;
+    color: $color;
+
+    &:hover {
+      background-color: $color-white;
+      color: $hover-color;
+    }
+    &:active,
+    &:global(.active) {
+      background-color: $color-white;
+      color: $active-color;
+    }
+  }
+}
+
+.base {
+  cursor: pointer;
+  display: inline-block;
+  padding: 0.3rem 1.8rem;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 3px;
+  font-size: $font-size-base;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-base;
+  transition: border 0.3s, background 0.3s, color 0.3s;
+}
+
+.default {
+  @include variant($color-gray);
+}
+
+.primary {
+  @include variant($color-blue);
+}
+
+.danger {
+  @include variant($color-red);
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

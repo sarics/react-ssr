@@ -1,0 +1,21 @@
+@import '../styles/variables';
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: $color-black;
+  color: $color-white;
+}
+
+.brand {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+}
+
+.nav {
+  & > a {
+    margin-left: 1rem;
+  }
+}
