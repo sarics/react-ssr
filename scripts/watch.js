@@ -8,28 +8,20 @@ const webpackDevMiddlewareReporter = require('webpack-dev-middleware/lib/reporte
 const requireFromString = require('require-from-string');
 const reload = require('reload');
 
-const clientConfig = require('../webpack.config.client');
-const ssrConfig = require('../webpack.config.ssr');
+const webpackConfig = require('../webpack.config');
 
-const { getFilesFromStats, buildManifest } = require('./utils');
-
-const compiler = webpack([
-  Object.assign({}, clientConfig, { name: 'client' }),
-  Object.assign({}, ssrConfig, { name: 'ssr' }),
-]);
+const [clientConfig, ssrConfig] = webpackConfig;
+const compiler = webpack(webpackConfig);
 
 const app = express();
+const reloadServer = reload(app);
+
 app.set('view engine', 'ejs');
 
-const reloadServer = reload(app);
 const devMiddleware = webpackDevMiddleware(compiler, {
   publicPath: clientConfig.output.publicPath,
   serverSideRender: true,
-  stats: {
-    colors: true,
-    chunks: false,
-    modules: false,
-  },
+  stats: 'errors-only',
   reporter: (middlewareOptions, options) => {
     webpackDevMiddlewareReporter(middlewareOptions, options);
 
@@ -53,10 +45,11 @@ app.get('/*', (req, res, next) => {
     return;
   }
 
-  const stats = webpackStats.toJson();
-  const clientStats = stats.children.find(({ name }) => name === 'client');
-  const clientFiles = getFilesFromStats(clientStats);
-  const files = buildManifest(clientFiles, clientConfig.output.publicPath);
+  const manifestJSON = res.locals.fs.readFileSync(
+    path.resolve(clientConfig.output.path, '../manifest.json'),
+    'utf8',
+  );
+  const manifest = JSON.parse(manifestJSON);
 
   const ssrContents = res.locals.fs.readFileSync(
     path.resolve(ssrConfig.output.path, ssrConfig.output.filename),
@@ -64,7 +57,7 @@ app.get('/*', (req, res, next) => {
   );
   const ssr = requireFromString(ssrContents, ssrConfig.output.filename).default;
 
-  res.locals.files = files;
+  res.locals.files = manifest;
 
   ssr(req, res, next);
 });
