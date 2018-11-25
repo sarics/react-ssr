@@ -2,7 +2,7 @@
 
 const express = require('express');
 
-const ssr = require('./build/ssr');
+const ssr = require('./build/ssr').default;
 const manifest = require('./build/manifest');
 
 let port = 8080;
