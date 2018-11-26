@@ -44,7 +44,7 @@ const getRules = type => {
       ].filter(Boolean),
     },
     {
-      test: /\.(jpe?g|png|gif|svg)$/,
+      test: /\.(jpe?g|png|gif|svg|ico)$/,
       use: [
         {
           loader: 'file-loader',

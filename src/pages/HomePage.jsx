@@ -5,7 +5,7 @@ import Content from '../components/Content';
 import reactLogoPath from '../images/react-logo.png';
 
 const HomePage = () => (
-  <Content>
+  <Content title="Home">
     <h2>Home page</h2>
 
     <p>
