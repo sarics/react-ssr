@@ -67,7 +67,7 @@ app.use((err, req, res, next) => {
   res.locals.error = err;
 
   res.status(500);
-  res.render('error', err);
+  res.render('error');
 });
 
 app.listen(8080, () => {
