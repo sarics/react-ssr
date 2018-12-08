@@ -11,6 +11,7 @@ const buildPath = path.resolve(__dirname, 'build');
 
 const getRules = type => {
   const isClient = type === 'client';
+  const isSSR = type === 'ssr';
 
   return [
     {
@@ -31,10 +32,11 @@ const getRules = type => {
       use: [
         isClient && MiniCssExtractPlugin.loader,
         {
-          loader: isClient ? 'css-loader' : 'css-loader/locals',
+          loader: 'css-loader',
           options: {
             modules: true,
             localIdentName: isProd ? 'c_[hash:8]' : '[name]__[local]--[hash:4]',
+            exportOnlyLocals: isSSR,
             importLoaders: 1,
           },
         },
