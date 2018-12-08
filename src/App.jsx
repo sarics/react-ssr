@@ -13,7 +13,7 @@ import faviconPath from './favicon.ico';
 
 const App = () => (
   <React.Fragment>
-    <Helmet defaultTitle="React RSS" titleTemplate="%s - React RSS">
+    <Helmet defaultTitle="React SSR" titleTemplate="%s - React SSR">
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta httpEquiv="X-UA-Compatible" content="ie=edge" />
