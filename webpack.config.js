@@ -30,7 +30,8 @@ const getRules = type => {
       test: /\.(scss|sass)$/,
       exclude: /node_modules/,
       use: [
-        isClient && MiniCssExtractPlugin.loader,
+        isProd && isClient && MiniCssExtractPlugin.loader,
+        !isProd && isClient && { loader: 'style-loader' },
         {
           loader: 'css-loader',
           options: {
@@ -86,13 +87,14 @@ const clientConfig = {
   },
 
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: isProd ? 'css/[name].[contenthash:8].css' : 'css/[name].css',
-    }),
+    isProd &&
+      new MiniCssExtractPlugin({
+        filename: 'css/[name].[contenthash:8].css',
+      }),
     new ManifestPlugin({
       fileName: '../manifest.json',
     }),
-  ],
+  ].filter(Boolean),
 
   optimization: {
     runtimeChunk: 'single',
