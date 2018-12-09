@@ -4,9 +4,8 @@ const path = require('path');
 const express = require('express');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
-const webpackDevMiddlewareReporter = require('webpack-dev-middleware/lib/reporter');
+const webpackHotMiddleware = require('webpack-hot-middleware');
 const requireFromString = require('require-from-string');
-const reload = require('reload');
 
 const webpackConfig = require('../webpack.config');
 
@@ -14,33 +13,22 @@ const [clientConfig, ssrConfig] = webpackConfig;
 const compiler = webpack(webpackConfig);
 
 const app = express();
-const reloadServer = reload(app);
 
 app.set('view engine', 'ejs');
 
 const devMiddleware = webpackDevMiddleware(compiler, {
   publicPath: clientConfig.output.publicPath,
   serverSideRender: true,
-  stats: 'errors-only',
-  reporter: (middlewareOptions, options) => {
-    webpackDevMiddlewareReporter(middlewareOptions, options);
-
-    reloadServer.reload();
-  },
+  stats: 'none',
+});
+const hotMiddleware = webpackHotMiddleware(compiler, {
+  log: false,
 });
 
 app.use(devMiddleware);
+app.use(hotMiddleware);
 
 app.get('/*', (req, res, next) => {
-  const { webpackStats } = res.locals;
-  if (webpackStats.hasErrors()) {
-    const errMsg = webpackStats
-      .toString('errors-only')
-      .replace(/\x1b\[\d+m/g, '');
-    next(new Error(errMsg));
-    return;
-  }
-
   const manifestJSON = res.locals.fs.readFileSync(
     path.resolve(clientConfig.output.path, '../manifest.json'),
     'utf8',

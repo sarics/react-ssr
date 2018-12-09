@@ -9,7 +9,10 @@
   </head>
   <body>
     <pre><%= error.stack || error.message %></pre>
+    <div id="app" style="display: none"></div>
 
-    <script src="/reload/reload.js"></script>
+    <script src="<%= files['runtime.js'] %>"></script>
+    <script src="<%= files['vendors.js'] %>"></script>
+    <script src="<%= files['main.js'] %>"></script>
   </body>
 </html>

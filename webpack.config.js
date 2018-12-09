@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
@@ -80,7 +81,10 @@ const clientConfig = {
 
   mode,
 
-  entry: './src/client.js',
+  entry: [
+    !isProd && 'webpack-hot-middleware/client?name=client&reload=true',
+    './src/client.js',
+  ].filter(Boolean),
 
   output: {
     path: path.join(buildPath, 'public'),
@@ -100,6 +104,8 @@ const clientConfig = {
   },
 
   plugins: [
+    !isProd && new webpack.HotModuleReplacementPlugin(),
+
     isProd &&
       new MiniCssExtractPlugin({
         filename: 'css/[name].[contenthash:8].css',

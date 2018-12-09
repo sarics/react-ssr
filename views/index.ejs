@@ -16,8 +16,5 @@
     <script src="<%= files['runtime.js'] %>"></script>
     <script src="<%= files['vendors.js'] %>"></script>
     <script src="<%= files['main.js'] %>"></script>
-    <% if (process.env.NODE_ENV === 'development') { %>
-      <script src="/reload/reload.js"></script>
-    <% } %>
   </body>
 </html>
