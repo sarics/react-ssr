@@ -31,10 +31,6 @@ const devMiddleware = webpackDevMiddleware(compiler, {
 
 app.use(devMiddleware);
 
-app.get(/\./, (req, res) => {
-  res.sendStatus(404);
-});
-
 app.get('/*', (req, res, next) => {
   const { webpackStats } = res.locals;
   if (webpackStats.hasErrors()) {

@@ -18,10 +18,6 @@ app.set('view engine', 'ejs');
 
 app.use(express.static('./build/public'));
 
-app.get(/\./, (req, res) => {
-  res.sendStatus(404);
-});
-
 app.get('/*', ssr);
 
 app.listen(port, () => {
