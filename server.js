@@ -12,6 +12,7 @@ if (process.env.PORT) {
 }
 
 const app = express();
+app.locals.files = manifest;
 
 app.set('view engine', 'ejs');
 
@@ -21,11 +22,7 @@ app.get(/\./, (req, res) => {
   res.sendStatus(404);
 });
 
-app.get('/*', (req, res, next) => {
-  res.locals.files = manifest;
-
-  ssr(req, res, next);
-});
+app.get('/*', ssr);
 
 app.listen(port, () => {
   console.log(`🚀 App listening on port ${port}`);
