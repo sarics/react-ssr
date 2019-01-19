@@ -16,14 +16,31 @@ const Header = () => (
       </span>
     </div>
 
-    <nav className={classes.nav}>
-      <Button component={NavLink} to="/" exact variant="primary">
+    <nav>
+      <Button
+        component={NavLink}
+        to="/"
+        exact
+        variant="primary"
+        className={classes.navButton}
+      >
         Home
       </Button>
-      <Button component={NavLink} to="/about" exact>
+      <Button
+        component={NavLink}
+        to="/about"
+        exact
+        className={classes.navButton}
+      >
         About
       </Button>
-      <Button component={NavLink} to="/notfound" exact variant="danger">
+      <Button
+        component={NavLink}
+        to="/notfound"
+        exact
+        variant="danger"
+        className={classes.navButton}
+      >
         404
       </Button>
     </nav>
