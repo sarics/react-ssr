@@ -22,6 +22,7 @@
     "core-js": "^2.6.2",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
+    "normalize.css": "^8.0.1",
     "prop-types": "^15.6.2",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
