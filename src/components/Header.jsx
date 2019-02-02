@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from '@reach/router';
 
 import classes from './Header.scss';
 
@@ -18,26 +18,19 @@ const Header = () => (
 
     <nav>
       <Button
-        component={NavLink}
+        component={Link}
         to="/"
-        exact
         variant="primary"
         className={classes.navButton}
       >
         Home
       </Button>
-      <Button
-        component={NavLink}
-        to="/about"
-        exact
-        className={classes.navButton}
-      >
+      <Button component={Link} to="/about" className={classes.navButton}>
         About
       </Button>
       <Button
-        component={NavLink}
+        component={Link}
         to="/notfound"
-        exact
         variant="danger"
         className={classes.navButton}
       >

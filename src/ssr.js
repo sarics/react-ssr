@@ -2,26 +2,28 @@
 
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import { StaticRouter as Router } from 'react-router-dom';
+import { ServerLocation, isRedirect } from '@reach/router';
 import { Helmet } from 'react-helmet';
 
 import App from './App';
 
 export default (req, res) => {
-  const context = {};
-
   const jsx = (
-    <Router location={req.url} context={context}>
+    <ServerLocation url={req.url}>
       <App />
-    </Router>
+    </ServerLocation>
   );
 
-  res.locals.reactDOM = renderToString(jsx);
-  res.locals.helmet = Helmet.renderStatic();
-  if (context.url) {
-    res.redirect(context.url);
-    return;
+  try {
+    res.locals.reactDOM = renderToString(jsx);
+  } catch (error) {
+    if (isRedirect(error)) {
+      res.redirect(error.uri);
+      return;
+    }
   }
+
+  res.locals.helmet = Helmet.renderStatic();
 
   res.render('index');
 };

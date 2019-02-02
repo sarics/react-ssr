@@ -26,7 +26,11 @@ const Button = ({
 );
 
 Button.propTypes = {
-  component: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  component: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func,
+    PropTypes.object,
+  ]),
   className: PropTypes.string,
   variant: PropTypes.oneOf(['default', 'primary', 'danger']),
   outlined: PropTypes.bool,
