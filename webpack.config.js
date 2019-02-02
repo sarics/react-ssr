@@ -152,7 +152,6 @@ const ssrConfig = {
     path: buildPath,
     publicPath,
     filename: 'ssr.js',
-    library: 'SSR',
     libraryTarget: 'commonjs2',
   },
 
