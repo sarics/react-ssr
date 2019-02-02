@@ -1,4 +1,4 @@
-/* eslint no-console: 'off', no-control-regex: 'off', import/no-extraneous-dependencies: 'off' */
+/* eslint no-console: 'off', import/no-extraneous-dependencies: 'off' */
 
 const path = require('path');
 const express = require('express');
