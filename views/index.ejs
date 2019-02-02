@@ -9,12 +9,19 @@
     <% } %>
 
     <%- helmet.link.toString() %>
+
+    <% bundles.css.forEach((file) => { %>
+      <link rel="stylesheet" href="<%= file %>">
+    <% }) %>
+
+    <% bundles.js.forEach((file) => { %>
+      <script src="<%= file %>"></script>
+    <% }) %>
   </head>
   <body <%- helmet.bodyAttributes.toString() %>>
     <div id="app"><%- reactDOM %></div>
 
     <script src="<%= files['runtime.js'] %>"></script>
-    <script src="<%= files['vendors.js'] %>"></script>
     <script src="<%= files['main.js'] %>"></script>
   </body>
 </html>

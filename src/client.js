@@ -5,6 +5,7 @@ import 'core-js';
 import React from 'react';
 import { hydrate } from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
+import Loadable from 'react-loadable';
 
 import App from './App';
 
@@ -14,4 +15,6 @@ const jsx = (
   </Router>
 );
 
-hydrate(jsx, document.getElementById('app'));
+Loadable.preloadReady().then(() => {
+  hydrate(jsx, document.getElementById('app'));
+});

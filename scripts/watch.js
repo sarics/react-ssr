@@ -41,6 +41,9 @@ app.get('/*', (req, res, next) => {
   );
   const ssr = requireFromString(ssrContents, ssrConfig.output.filename).default;
 
+  res.locals.clientStats = res.locals.webpackStats
+    .toJson()
+    .children.find(({ name }) => name === 'client');
   res.locals.files = manifest;
 
   ssr(req, res, next);

@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const StatsPlugin = require('stats-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
@@ -13,70 +14,108 @@ const extensions = ['.wasm', '.mjs', '.js', '.jsx', '.json'];
 const buildPath = path.resolve(__dirname, 'build');
 const publicPath = '/';
 
-const getRules = type => {
-  const isClient = type === 'client';
-  const isSSR = type === 'ssr';
+const isClient = type => type === 'client';
+const isSSR = type => type === 'ssr';
 
-  return [
-    {
-      test: /\.jsx?$/,
-      exclude: /node_modules/,
-      use: [
-        {
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: true,
-          },
+const getBabelCfg = type => ({
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        modules: false,
+        useBuiltIns: 'entry',
+      },
+    ],
+    [
+      '@babel/preset-react',
+      {
+        development: !isProd,
+        useBuiltIns: true,
+      },
+    ],
+  ],
+  plugins: [
+    [
+      '@babel/plugin-proposal-object-rest-spread',
+      {
+        useBuiltIns: true,
+      },
+    ],
+    '@babel/plugin-transform-runtime',
+    isClient(type)
+      ? '@babel/plugin-syntax-dynamic-import'
+      : 'dynamic-import-node',
+    'react-loadable/babel',
+    isProd && [
+      'babel-plugin-transform-react-remove-prop-types',
+      {
+        removeImport: true,
+      },
+    ],
+  ].filter(Boolean),
+});
+
+const getRules = type => [
+  {
+    test: /\.jsx?$/,
+    exclude: /node_modules/,
+    use: [
+      {
+        loader: 'babel-loader',
+        options: {
+          cacheDirectory: true,
+
+          ...getBabelCfg(type),
         },
-      ],
-    },
-    {
-      test: /\.(scss|sass)$/,
-      exclude: /node_modules/,
-      use: [
-        isProd && isClient && MiniCssExtractPlugin.loader,
-        !isProd && isClient && { loader: 'style-loader' },
-        {
-          loader: 'css-loader',
-          options: {
-            modules: true,
-            localIdentName: isProd ? 'c_[hash:8]' : '[name]__[local]--[hash:4]',
-            exportOnlyLocals: isSSR,
-            importLoaders: 1,
-          },
+      },
+    ],
+  },
+  {
+    test: /\.(scss|sass)$/,
+    exclude: /node_modules/,
+    use: [
+      isProd && isClient(type) && MiniCssExtractPlugin.loader,
+      !isProd && isClient(type) && { loader: 'style-loader' },
+      {
+        loader: 'css-loader',
+        options: {
+          modules: true,
+          localIdentName: isProd ? 'c_[hash:8]' : '[name]__[local]--[hash:4]',
+          exportOnlyLocals: isSSR(type),
+          importLoaders: 1,
         },
-        {
-          loader: 'sass-loader',
+      },
+      {
+        loader: 'sass-loader',
+      },
+    ].filter(Boolean),
+  },
+  {
+    test: /favicon\.ico$/,
+    use: [
+      {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          emitFile: isClient(type),
         },
-      ].filter(Boolean),
-    },
-    {
-      test: /favicon\.ico$/,
-      use: [
-        {
-          loader: 'file-loader',
-          options: {
-            name: '[name].[ext]',
-            emitFile: isClient,
-          },
+      },
+    ],
+  },
+  {
+    test: /\.(jpe?g|png|gif|svg)$/,
+    use: [
+      {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[hash:8].[ext]',
+          outputPath: 'images/',
+          emitFile: isClient(type),
         },
-      ],
-    },
-    {
-      test: /\.(jpe?g|png|gif|svg)$/,
-      use: [
-        {
-          loader: 'file-loader',
-          options: {
-            name: '[name].[hash:8].[ext]',
-            outputPath: 'images/',
-            emitFile: isClient,
-          },
-        },
-      ],
-    },
-  ];
-};
+      },
+    ],
+  },
+];
 
 const clientConfig = {
   name: 'client',
@@ -112,6 +151,7 @@ const clientConfig = {
       new MiniCssExtractPlugin({
         filename: 'css/[name].[contenthash:8].css',
       }),
+    isProd && new StatsPlugin('../stats.json'),
     new ManifestPlugin({
       fileName: '../manifest.json',
     }),
@@ -119,15 +159,6 @@ const clientConfig = {
 
   optimization: {
     runtimeChunk: 'single',
-    splitChunks: {
-      cacheGroups: {
-        vendors: {
-          test: /[\\/]node_modules[\\/].*\.js$/,
-          name: 'vendors',
-          chunks: 'all',
-        },
-      },
-    },
     minimizer: [
       new TerserPlugin({
         cache: true,
