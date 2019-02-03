@@ -6,53 +6,20 @@ const StatsPlugin = require('stats-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
+const {
+  CONFIG_TYPE_CLIENT,
+  CONFIG_TYPE_SSR,
+  isClient,
+  isSSR,
+} = require('./scripts/configTypes');
+const getBabelConfig = require('./scripts/getBabelConfig');
+
 const isProd = process.env.NODE_ENV === 'production';
 
 const mode = isProd ? 'production' : 'development';
 const extensions = ['.wasm', '.mjs', '.js', '.jsx', '.json'];
 const buildPath = path.resolve(__dirname, 'build');
 const publicPath = '/';
-
-const isClient = type => type === 'client';
-const isSSR = type => type === 'ssr';
-
-const getBabelCfg = type => ({
-  presets: [
-    [
-      '@babel/preset-env',
-      {
-        modules: false,
-        useBuiltIns: 'entry',
-      },
-    ],
-    [
-      '@babel/preset-react',
-      {
-        development: !isProd,
-        useBuiltIns: true,
-      },
-    ],
-  ],
-  plugins: [
-    [
-      '@babel/plugin-proposal-object-rest-spread',
-      {
-        useBuiltIns: true,
-      },
-    ],
-    '@babel/plugin-transform-runtime',
-    isClient(type)
-      ? '@babel/plugin-syntax-dynamic-import'
-      : 'dynamic-import-node',
-    'react-loadable/babel',
-    isProd && [
-      'babel-plugin-transform-react-remove-prop-types',
-      {
-        removeImport: true,
-      },
-    ],
-  ].filter(Boolean),
-});
 
 const getRules = type => [
   {
@@ -64,7 +31,7 @@ const getRules = type => [
         options: {
           cacheDirectory: true,
 
-          ...getBabelCfg(type),
+          ...getBabelConfig(type),
         },
       },
     ],
@@ -117,12 +84,13 @@ const getRules = type => [
 ];
 
 const clientConfig = {
-  name: 'client',
+  name: CONFIG_TYPE_CLIENT,
 
   mode,
 
   entry: [
-    !isProd && 'webpack-hot-middleware/client?name=client&reload=true',
+    !isProd &&
+      `webpack-hot-middleware/client?name=${CONFIG_TYPE_CLIENT}&reload=true`,
     './src/client.js',
   ].filter(Boolean),
 
@@ -140,7 +108,7 @@ const clientConfig = {
   },
 
   module: {
-    rules: getRules('client'),
+    rules: getRules(CONFIG_TYPE_CLIENT),
   },
 
   plugins: [
@@ -181,7 +149,7 @@ const clientConfig = {
 };
 
 const ssrConfig = {
-  name: 'ssr',
+  name: CONFIG_TYPE_SSR,
 
   mode,
 
@@ -205,7 +173,7 @@ const ssrConfig = {
   },
 
   module: {
-    rules: getRules('ssr'),
+    rules: getRules(CONFIG_TYPE_SSR),
   },
 
   optimization: {

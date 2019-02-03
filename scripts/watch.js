@@ -7,6 +7,7 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const requireFromString = require('require-from-string');
 
+const { CONFIG_TYPE_CLIENT } = require('./configTypes');
 const getFilesFromStats = require('./getFilesFromStats');
 const webpackConfig = require('../webpack.config');
 
@@ -37,7 +38,9 @@ app.get('/*', (req, res, next) => {
   const ssr = requireFromString(ssrContents, ssrConfig.output.filename).default;
 
   const stats = res.locals.webpackStats.toJson();
-  const clientStats = stats.children.find(({ name }) => name === 'client');
+  const clientStats = stats.children.find(
+    ({ name }) => name === CONFIG_TYPE_CLIENT,
+  );
   const files = getFilesFromStats(clientStats);
 
   res.locals.js = files.initial.js;
