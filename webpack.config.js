@@ -176,6 +176,8 @@ const clientConfig = {
       new OptimizeCSSAssetsPlugin({}),
     ],
   },
+
+  stats: 'minimal',
 };
 
 const ssrConfig = {
@@ -209,6 +211,12 @@ const ssrConfig = {
   optimization: {
     minimize: false,
   },
+
+  performance: {
+    hints: false,
+  },
+
+  stats: 'minimal',
 };
 
 module.exports = [clientConfig, ssrConfig];
