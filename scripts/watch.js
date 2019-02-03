@@ -7,6 +7,7 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const requireFromString = require('require-from-string');
 
+const getFilesFromStats = require('./getFilesFromStats');
 const webpackConfig = require('../webpack.config');
 
 const [clientConfig, ssrConfig] = webpackConfig;
@@ -29,22 +30,16 @@ app.use(devMiddleware);
 app.use(hotMiddleware);
 
 app.get('/*', (req, res, next) => {
-  const manifestJSON = res.locals.fs.readFileSync(
-    path.resolve(clientConfig.output.path, '../manifest.json'),
-    'utf8',
-  );
-  const manifest = JSON.parse(manifestJSON);
-
   const ssrContents = res.locals.fs.readFileSync(
     path.resolve(ssrConfig.output.path, ssrConfig.output.filename),
     'utf8',
   );
   const ssr = requireFromString(ssrContents, ssrConfig.output.filename).default;
 
-  res.locals.clientStats = res.locals.webpackStats
-    .toJson()
-    .children.find(({ name }) => name === 'client');
-  res.locals.files = manifest;
+  const stats = res.locals.webpackStats.toJson();
+  const clientStats = stats.children.find(({ name }) => name === 'client');
+
+  res.locals.files = getFilesFromStats(clientStats);
 
   ssr(req, res, next);
 });

@@ -4,24 +4,17 @@
     <%- helmet.meta.toString() %>
     <%- helmet.title.toString() %>
 
-    <% if (process.env.NODE_ENV !== 'development') { %>
-      <link rel="stylesheet" href="<%= files['main.css'] %>">
-    <% } %>
-
-    <%- helmet.link.toString() %>
-
-    <% bundles.css.forEach((file) => { %>
+    <% css.forEach((file) => { %>
       <link rel="stylesheet" href="<%= file %>">
     <% }) %>
 
-    <% bundles.js.forEach((file) => { %>
-      <script src="<%= file %>"></script>
-    <% }) %>
+    <%- helmet.link.toString() %>
   </head>
   <body <%- helmet.bodyAttributes.toString() %>>
     <div id="app"><%- reactDOM %></div>
 
-    <script src="<%= files['runtime.js'] %>"></script>
-    <script src="<%= files['main.js'] %>"></script>
+    <% js.forEach((file) => { %>
+      <script src="<%= file %>"></script>
+    <% }) %>
   </body>
 </html>

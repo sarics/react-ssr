@@ -3,8 +3,8 @@
 const express = require('express');
 
 const ssr = require('./build/ssr').default;
-const manifest = require('./build/manifest');
 const stats = require('./build/stats');
+const getFilesFromStats = require('./scripts/getFilesFromStats');
 
 let port = 8080;
 if (process.env.PORT) {
@@ -13,8 +13,7 @@ if (process.env.PORT) {
 }
 
 const app = express();
-app.locals.files = manifest;
-app.locals.clientStats = stats;
+app.locals.files = getFilesFromStats(stats);
 
 app.set('view engine', 'ejs');
 

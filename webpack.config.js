@@ -3,7 +3,6 @@ const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const StatsPlugin = require('stats-webpack-plugin');
-const ManifestPlugin = require('webpack-manifest-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
@@ -151,14 +150,23 @@ const clientConfig = {
       new MiniCssExtractPlugin({
         filename: 'css/[name].[contenthash:8].css',
       }),
+
     isProd && new StatsPlugin('../stats.json'),
-    new ManifestPlugin({
-      fileName: '../manifest.json',
-    }),
   ].filter(Boolean),
 
   optimization: {
     runtimeChunk: 'single',
+    splitChunks: {
+      chunks: 'all',
+      cacheGroups: {
+        styles: {
+          name: 'styles',
+          test: /\.(css|scss|sass)$/,
+          chunks: 'initial',
+          enforce: true,
+        },
+      },
+    },
     minimizer: [
       new TerserPlugin({
         cache: true,
