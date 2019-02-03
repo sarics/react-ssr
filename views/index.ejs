@@ -9,6 +9,14 @@
     <% }) %>
 
     <%- helmet.link.toString() %>
+
+    <% asyncCss.forEach((file) => { %>
+      <link rel="stylesheet" href="<%= file %>">
+    <% }) %>
+
+    <% asyncJs.forEach((file) => { %>
+      <script src="<%= file %>"></script>
+    <% }) %>
   </head>
   <body <%- helmet.bodyAttributes.toString() %>>
     <div id="app"><%- reactDOM %></div>

@@ -13,13 +13,13 @@ if (process.env.PORT) {
 }
 
 const app = express();
-app.locals.files = getFilesFromStats(stats);
+const files = getFilesFromStats(stats);
 
 app.set('view engine', 'ejs');
 
 app.use(express.static('./build/public'));
 
-app.get('/*', ssr);
+app.get('/*', ssr({ files }));
 
 app.listen(port, () => {
   console.log(`🚀 App listening on port ${port}`);

@@ -19,36 +19,33 @@ const getAsyncFiles = (modules, files) =>
       { css: [], js: [] },
     );
 
-export default (req, res) => {
+export default ({ files }) => (req, res) => {
   Loadable.preloadAll().then(() => {
     const modules = [];
     const context = {};
 
     const jsx = (
-      <Loadable.Capture report={modules.push}>
+      <Loadable.Capture report={moduleName => modules.push(moduleName)}>
         <Router location={req.url} context={context}>
           <App />
         </Router>
       </Loadable.Capture>
     );
 
-    res.locals.reactDOM = renderToString(jsx);
+    const reactDOM = renderToString(jsx);
     if (context.url) {
       res.redirect(context.url);
       return;
     }
 
-    const files = res.locals.files || req.app.locals.files || {};
-    const { css: initialCss, js: initialJs } = files.initial;
+    const helmet = Helmet.renderStatic();
+
+    const { css, js } = files.initial;
     const { css: asyncCss, js: asyncJs } = getAsyncFiles(
       modules,
       files.asyncByRequest,
     );
 
-    res.locals.helmet = Helmet.renderStatic();
-    res.locals.css = initialCss.concat(asyncCss);
-    res.locals.js = initialJs.concat(asyncJs);
-
-    res.render('index');
+    res.render('index', { reactDOM, helmet, css, asyncCss, js, asyncJs });
   });
 };

@@ -38,10 +38,9 @@ app.get('/*', (req, res, next) => {
 
   const stats = res.locals.webpackStats.toJson();
   const clientStats = stats.children.find(({ name }) => name === 'client');
+  const files = getFilesFromStats(clientStats);
 
-  res.locals.files = getFilesFromStats(clientStats);
-
-  ssr(req, res, next);
+  ssr({ files })(req, res, next);
 });
 
 // eslint-disable-next-line no-unused-vars
