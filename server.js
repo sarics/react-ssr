@@ -15,6 +15,9 @@ if (process.env.PORT) {
 const app = express();
 const files = getFilesFromStats(stats);
 
+app.locals.css = files.initial.css;
+app.locals.js = files.initial.js;
+
 app.set('view engine', 'ejs');
 
 app.use(express.static('./build/public'));

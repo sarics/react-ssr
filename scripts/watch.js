@@ -40,6 +40,9 @@ app.get('/*', (req, res, next) => {
   const clientStats = stats.children.find(({ name }) => name === 'client');
   const files = getFilesFromStats(clientStats);
 
+  res.locals.js = files.initial.js;
+  res.locals.css = files.initial.css;
+
   ssr({ files })(req, res, next);
 });
 
