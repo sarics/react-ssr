@@ -12,10 +12,15 @@ const getAsyncFiles = (modules, files) =>
   modules
     .map(moduleName => files[moduleName])
     .reduce(
-      ({ css, js }, chunkFiles) => ({
-        css: css.concat(chunkFiles.css),
-        js: js.concat(chunkFiles.js),
-      }),
+      ({ css, js }, chunkFiles) => {
+        const chunkCss = chunkFiles.css.filter(file => !css.includes(file));
+        const chunkJs = chunkFiles.js.filter(file => !js.includes(file));
+
+        return {
+          css: css.concat(chunkCss),
+          js: js.concat(chunkJs),
+        };
+      },
       { css: [], js: [] },
     );
 

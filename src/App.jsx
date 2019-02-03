@@ -10,11 +10,12 @@ import Header from './components/Header';
 import faviconPath from './favicon.ico';
 
 const LoadableHomePage = Loadable({
-  loader: () => import('./pages/HomePage'),
+  loader: () => import(/* webpackChunkName: "pages/home" */ './pages/HomePage'),
   loading: () => <div>Loading...</div>,
 });
 const LoadableAboutPage = Loadable({
-  loader: () => import('./pages/AboutPage'),
+  loader: () =>
+    import(/* webpackChunkName: "pages/about" */ './pages/AboutPage'),
   loading: () => <div>Loading...</div>,
 });
 

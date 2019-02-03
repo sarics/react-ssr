@@ -9,12 +9,12 @@ import Loadable from 'react-loadable';
 
 import App from './App';
 
-const jsx = (
-  <Router>
-    <App />
-  </Router>
-);
-
 Loadable.preloadReady().then(() => {
+  const jsx = (
+    <Router>
+      <App />
+    </Router>
+  );
+
   hydrate(jsx, document.getElementById('app'));
 });
