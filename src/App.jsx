@@ -6,17 +6,19 @@ import Loadable from 'react-loadable';
 import './styles/global.scss';
 
 import Header from './components/Header';
+import LoadingContent from './components/LoadingContent';
 
 import faviconPath from './favicon.ico';
 
 const LoadableHomePage = Loadable({
   loader: () => import(/* webpackChunkName: "pages/home" */ './pages/HomePage'),
-  loading: () => <div>Loading...</div>,
+  loading: LoadingContent,
 });
+
 const LoadableAboutPage = Loadable({
   loader: () =>
     import(/* webpackChunkName: "pages/about" */ './pages/AboutPage'),
-  loading: () => <div>Loading...</div>,
+  loading: LoadingContent,
 });
 
 const App = () => (
