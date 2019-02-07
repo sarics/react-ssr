@@ -1,11 +1,13 @@
 const createGetChunkFiles = publicPath => chunk =>
-  chunk.files.reduce(
-    ({ css, js }, file) => ({
-      css: /\.css$/.test(file) ? css.concat(publicPath + file) : css,
-      js: /\.js$/.test(file) ? js.concat(publicPath + file) : js,
-    }),
-    { css: [], js: [] },
-  );
+  chunk.files
+    .filter(file => !/\.hot-update\.js$/.test(file))
+    .reduce(
+      ({ css, js }, file) => ({
+        css: /\.css$/.test(file) ? css.concat(publicPath + file) : css,
+        js: /\.js$/.test(file) ? js.concat(publicPath + file) : js,
+      }),
+      { css: [], js: [] },
+    );
 
 module.exports = ({ publicPath, chunks }) => {
   const getChunkFiles = createGetChunkFiles(publicPath);
