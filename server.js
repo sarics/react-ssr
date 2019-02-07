@@ -3,7 +3,8 @@
 const express = require('express');
 
 const ssr = require('./build/ssr').default;
-const manifest = require('./build/manifest');
+const stats = require('./build/stats');
+const getFilesFromStats = require('./scripts/getFilesFromStats');
 
 let port = 8080;
 if (process.env.PORT) {
@@ -12,13 +13,16 @@ if (process.env.PORT) {
 }
 
 const app = express();
-app.locals.files = manifest;
+const files = getFilesFromStats(stats);
+
+app.locals.css = files.initial.css;
+app.locals.js = files.initial.js;
 
 app.set('view engine', 'ejs');
 
 app.use(express.static('./build/public'));
 
-app.get('/*', ssr);
+app.get('/*', ssr({ files }));
 
 app.listen(port, () => {
   console.log(`🚀 App listening on port ${port}`);

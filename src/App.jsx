@@ -1,15 +1,25 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import Loadable from 'react-loadable';
 
 import './styles/global.scss';
 
 import Header from './components/Header';
-
-import HomePage from './pages/HomePage';
-import AboutPage from './pages/AboutPage';
+import LoadingContent from './components/LoadingContent';
 
 import faviconPath from './favicon.ico';
+
+const LoadableHomePage = Loadable({
+  loader: () => import(/* webpackChunkName: "pages/home" */ './pages/HomePage'),
+  loading: LoadingContent,
+});
+
+const LoadableAboutPage = Loadable({
+  loader: () =>
+    import(/* webpackChunkName: "pages/about" */ './pages/AboutPage'),
+  loading: LoadingContent,
+});
 
 const App = () => (
   <React.Fragment>
@@ -24,8 +34,8 @@ const App = () => (
     <Header />
 
     <Switch>
-      <Route path="/" exact component={HomePage} />
-      <Route path="/about" exact component={AboutPage} />
+      <Route path="/" exact component={LoadableHomePage} />
+      <Route path="/about" exact component={LoadableAboutPage} />
       <Route>
         <Redirect to="/" />
       </Route>

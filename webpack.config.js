@@ -2,9 +2,17 @@ const path = require('path');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const ManifestPlugin = require('webpack-manifest-plugin');
+const StatsPlugin = require('stats-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+
+const {
+  CONFIG_TYPE_CLIENT,
+  CONFIG_TYPE_SSR,
+  isClient,
+  isSSR,
+} = require('./scripts/configTypes');
+const getBabelConfig = require('./scripts/getBabelConfig');
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -13,78 +21,76 @@ const extensions = ['.wasm', '.mjs', '.js', '.jsx', '.json'];
 const buildPath = path.resolve(__dirname, 'build');
 const publicPath = '/';
 
-const getRules = type => {
-  const isClient = type === 'client';
-  const isSSR = type === 'ssr';
+const getRules = type => [
+  {
+    test: /\.jsx?$/,
+    exclude: /node_modules/,
+    use: [
+      {
+        loader: 'babel-loader',
+        options: {
+          cacheDirectory: true,
 
-  return [
-    {
-      test: /\.jsx?$/,
-      exclude: /node_modules/,
-      use: [
-        {
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: true,
-          },
+          ...getBabelConfig(type),
         },
-      ],
-    },
-    {
-      test: /\.(scss|sass)$/,
-      exclude: /node_modules/,
-      use: [
-        isProd && isClient && MiniCssExtractPlugin.loader,
-        !isProd && isClient && { loader: 'style-loader' },
-        {
-          loader: 'css-loader',
-          options: {
-            modules: true,
-            localIdentName: isProd ? 'c_[hash:8]' : '[name]__[local]--[hash:4]',
-            exportOnlyLocals: isSSR,
-            importLoaders: 1,
-          },
+      },
+    ],
+  },
+  {
+    test: /\.(scss|sass)$/,
+    exclude: /node_modules/,
+    use: [
+      isProd && isClient(type) && MiniCssExtractPlugin.loader,
+      !isProd && isClient(type) && { loader: 'style-loader' },
+      {
+        loader: 'css-loader',
+        options: {
+          modules: true,
+          localIdentName: isProd ? 'c_[hash:8]' : '[name]__[local]--[hash:4]',
+          exportOnlyLocals: isSSR(type),
+          importLoaders: 1,
         },
-        {
-          loader: 'sass-loader',
+      },
+      {
+        loader: 'sass-loader',
+      },
+    ].filter(Boolean),
+  },
+  {
+    test: /favicon\.ico$/,
+    use: [
+      {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          emitFile: isClient(type),
         },
-      ].filter(Boolean),
-    },
-    {
-      test: /favicon\.ico$/,
-      use: [
-        {
-          loader: 'file-loader',
-          options: {
-            name: '[name].[ext]',
-            emitFile: isClient,
-          },
+      },
+    ],
+  },
+  {
+    test: /\.(jpe?g|png|gif|svg)$/,
+    use: [
+      {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[hash:8].[ext]',
+          outputPath: 'images/',
+          emitFile: isClient(type),
         },
-      ],
-    },
-    {
-      test: /\.(jpe?g|png|gif|svg)$/,
-      use: [
-        {
-          loader: 'file-loader',
-          options: {
-            name: '[name].[hash:8].[ext]',
-            outputPath: 'images/',
-            emitFile: isClient,
-          },
-        },
-      ],
-    },
-  ];
-};
+      },
+    ],
+  },
+];
 
 const clientConfig = {
-  name: 'client',
+  name: CONFIG_TYPE_CLIENT,
 
   mode,
 
   entry: [
-    !isProd && 'webpack-hot-middleware/client?name=client&reload=true',
+    !isProd &&
+      `webpack-hot-middleware/client?name=${CONFIG_TYPE_CLIENT}&reload=true`,
     './src/client.js',
   ].filter(Boolean),
 
@@ -102,7 +108,7 @@ const clientConfig = {
   },
 
   module: {
-    rules: getRules('client'),
+    rules: getRules(CONFIG_TYPE_CLIENT),
   },
 
   plugins: [
@@ -112,19 +118,20 @@ const clientConfig = {
       new MiniCssExtractPlugin({
         filename: 'css/[name].[contenthash:8].css',
       }),
-    new ManifestPlugin({
-      fileName: '../manifest.json',
-    }),
+
+    isProd && new StatsPlugin('../stats.json'),
   ].filter(Boolean),
 
   optimization: {
     runtimeChunk: 'single',
     splitChunks: {
+      chunks: 'all',
       cacheGroups: {
-        vendors: {
-          test: /[\\/]node_modules[\\/].*\.js$/,
-          name: 'vendors',
-          chunks: 'all',
+        styles: {
+          name: 'styles',
+          test: /\.(css|scss|sass)$/,
+          chunks: 'initial',
+          enforce: true,
         },
       },
     },
@@ -137,10 +144,12 @@ const clientConfig = {
       new OptimizeCSSAssetsPlugin({}),
     ],
   },
+
+  stats: 'minimal',
 };
 
 const ssrConfig = {
-  name: 'ssr',
+  name: CONFIG_TYPE_SSR,
 
   mode,
 
@@ -164,12 +173,18 @@ const ssrConfig = {
   },
 
   module: {
-    rules: getRules('ssr'),
+    rules: getRules(CONFIG_TYPE_SSR),
   },
 
   optimization: {
     minimize: false,
   },
+
+  performance: {
+    hints: false,
+  },
+
+  stats: 'minimal',
 };
 
 module.exports = [clientConfig, ssrConfig];

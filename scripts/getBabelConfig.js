@@ -1,6 +1,8 @@
+const { isClient } = require('./configTypes');
+
 const isProd = process.env.NODE_ENV === 'production';
 
-module.exports = {
+module.exports = type => ({
   presets: [
     [
       '@babel/preset-env',
@@ -17,8 +19,8 @@ module.exports = {
       },
     ],
   ],
+
   plugins: [
-    '@babel/plugin-syntax-dynamic-import',
     [
       '@babel/plugin-proposal-object-rest-spread',
       {
@@ -26,6 +28,12 @@ module.exports = {
       },
     ],
     '@babel/plugin-transform-runtime',
+
+    isClient(type)
+      ? '@babel/plugin-syntax-dynamic-import'
+      : 'dynamic-import-node',
+    'react-loadable/babel',
+
     isProd && [
       'babel-plugin-transform-react-remove-prop-types',
       {
@@ -33,4 +41,4 @@ module.exports = {
       },
     ],
   ].filter(Boolean),
-};
+});
