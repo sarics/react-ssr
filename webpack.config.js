@@ -114,6 +114,7 @@ const clientConfig = {
   plugins: [
     !isProd && new webpack.HotModuleReplacementPlugin(),
 
+    isProd && new webpack.HashedModuleIdsPlugin(),
     isProd &&
       new MiniCssExtractPlugin({
         filename: 'css/[name].[contenthash:8].css',
