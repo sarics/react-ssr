@@ -7,7 +7,7 @@ import Content from '../components/Content';
 
 const AboutPage = () => (
   <Content title="About" className={classes.content}>
-    <h2>About page</h2>
+    <h1>About page</h1>
 
     <p>
       <Link to="/">Back to home</Link>
