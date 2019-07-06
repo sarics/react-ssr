@@ -9,6 +9,8 @@ module.exports = type => ({
       {
         modules: false,
         useBuiltIns: 'entry',
+        corejs: 3,
+        targets: isClient(type) ? {} : { node: 'current' },
       },
     ],
     [
@@ -31,7 +33,7 @@ module.exports = type => ({
 
     isClient(type)
       ? '@babel/plugin-syntax-dynamic-import'
-      : 'dynamic-import-node',
+      : 'babel-plugin-dynamic-import-node',
     'react-loadable/babel',
 
     isProd && [

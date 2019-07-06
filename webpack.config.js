@@ -146,6 +146,12 @@ const clientConfig = {
     ],
   },
 
+  performance: {
+    assetFilter: assetFilename => assetFilename.endsWith('.js'),
+    maxAssetSize: 245 * 1024,
+    maxEntrypointSize: 255 * 1024,
+  },
+
   stats: 'minimal',
 };
 
