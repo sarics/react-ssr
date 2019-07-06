@@ -45,9 +45,11 @@ const getRules = type => [
       {
         loader: 'css-loader',
         options: {
-          modules: true,
-          localIdentName: isProd ? 'c_[hash:8]' : '[name]__[local]--[hash:4]',
-          exportOnlyLocals: isSSR(type),
+          modules: {
+            mode: 'local',
+            localIdentName: isProd ? 'c_[hash:8]' : '[name]__[local]--[hash:4]',
+          },
+          onlyLocals: isSSR(type),
           importLoaders: 1,
         },
       },
